@@ -26,6 +26,9 @@ change:
 1) don't die at 1 hit
 2) shoot is now left alt
 
+Team 3
+- to enable invicible mode for testing start game with `ruby game.rb true`
+
 Other observations
 - player moves by angle in
     -look at girar_direita(player.rb:118), girar_esquerda(player.rb:124)
