@@ -359,7 +359,7 @@ def mordido
 		@last_bite = @last_time
 		@player.alive = false
 		@player.hits += 1
-		if(@player.hits > 1)
+		if(@player.hits > 2)
 		@die.play
 		self.morre
 		end
