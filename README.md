@@ -20,7 +20,7 @@ The speed-sprint project can be found here: https://github.com/k00ka/speed-sprin
 4. Mini-map
 
   These levels are huge! Players are reporting going in circles and being lost. Create a mini-map to help them navigate each level.
-  
+
 Team 5
 change:
 1) don't die at 1 hit
@@ -29,4 +29,11 @@ change:
 Other observations
 - player moves by angle in
     -look at girar_direita(player.rb:118), girar_esquerda(player.rb:124)
-- actual key input is in: (inception.rb ~ 698)    
+- actual key input is in: (inception.rb ~ 698)
+
+Team 3
+change:
+1. refactor map class to own file
+2. added portal image to media folder
+3. removed random inception
+3. added portal class (is not called in program currently)

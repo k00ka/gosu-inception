@@ -1,224 +1,10 @@
 require 'gosu'
+require_relative 'map'
 require_relative 'player'
 require_relative 'bullet'
 require_relative 'zombie'
-require_relative 'car' 
-class Map
-	attr_reader :width, :height
-	def initialize(window, filename,tipo)
-		@tileset = Gosu::Image::load_tiles(window, "media/vase3.png", 32, 32, true)
-		lines = File.readlines(filename).map { |line| line.chomp }
-		@tipo = tipo
-		@height = lines.size
-		@width = lines[0].size
-		if(@tipo == "urbano")
-		@tiles = Array.new(@width) do |x|
-		Array.new(@height) do |y|
-			case lines[y][x, 1]
-				
-				when '"'
-					4
-				when 'c'
-					3
-				when 't'
-					6
-				when ','
-					13
-				when 's'
-					15
-				when 'o'
-					25
-				when 'i'
-					26
-				when 'u'
-					27
-				when 'd'
-					7
-				when '$'
-					45
-				when 'a'
-					46
-				when '-'
-					64
-				when 'e'
-					60
-				when 'z'
-					67
-				when 'x'
-					84
-				when 'y'
-					94
-				when 'p'
-					118 #solido
-				when '#'
-					124 #solido
-				when '%'
-					127 #solido
-				when 'q'
-					135 #solido
-				when 'l'
-					149 #solido
-				when 'w'
-					152 #solido
-				when 'j'
-					173 #solido/arvore
-				when 'k'
-					174 #solido/arvore
-				when 'n'
-					190 #solido/arvore
-				when 'm'
-					191 #solido/arvore
-				when 'f'
-					202
-				when 'g'
-					203
-				when 'v'
-					219
-				when 'b'
-					220
-				else
-					5
-				end
-			end
-		end
-		elsif(@tipo == "deserto")
-			@tiles = Array.new(@width) do |x|
-			Array.new(@height) do |y|
-			case lines[y][x, 1]
-				when 'p'
-					63 #solido
-				when '.'
-					7
-				when '='
-					5
-				when '+'
-					34
-				when '#'
-					27
-				when '@'
-					25
-				when '&'
-					142
-				when '%'
-					125
-				when '!'
-					32
-				when '?'
-					66
-				when '$'
-					15	
-				else
-					6
-				end
-			end
-		end
-		elsif(@tipo == "inferno")
-			@tiles = Array.new(@width) do |x|
-			Array.new(@height) do |y|
-			case lines[y][x, 1]
-				when 'p'
-					63 #solido
-				when '@'
-					88
-				when '.'
-					169
-				when '$'
-					134
-				when '+'
-					165
-				when 'r'
-					45
-				when 'e'
-					44
-				when '%'
-					164
-				when 'w'
-					64
-				when '&'
-					163
-				when '#'
-					168
-				when 'q'
-					55
-				when '*'	
-					132
-				when 't'
-					47
-				when '?'
-					38
-				else
-					88
-				end
-			end
-		end
-		
-		
-		elsif(@tipo == "futuro")
-			@tiles = Array.new(@width) do |x|
-			Array.new(@height) do |y|
-			case lines[y][x, 1]
-				when 'p'
-					155 #solido
-				when '.'
-					154
-				when '#'
-					153
-				when '@'
-					156
-				end
-			end
-		end
-		end
-	
-	end
+require_relative 'car'
 
-	def draw(camera_x,camera_y)
-		for x in ((camera_x/32) - 1).to_i .. ((camera_x/32) + 30).to_i
-			for y in ((camera_y/32) - 1).to_i .. ((camera_y/32) + 19).to_i
-				if(x < @width) && (y < @height)
-					tile = @tiles[x][y]
-					@tileset[tile].draw(x * 32, y * 32, 0)
-				end
-			end
-		end
-	end
-	
-		
-	def solid(x, y)
-		#if(x < @width) && (y < @height)
-			z = @tiles[x / 32][y / 32]
-			if(z == 155 || z==125 || z == 88 || z == 168 || z == 164 || z == 132 || z == 44 || z == 134 || z == 124 || z == 118 || z == 173 || z == 174 || z == 190 || z == 191 || z == 202 || z == 203 || z == 219 || z == 220 || z == 84 || z == 67 || z == 94 || z == 135 || z == 152 || z == 127 || z == 149 || z == 63 || z == 133 || z == 34 || z == 142)
-	
-				return true
-			else
-				return false
-			end
-		#else
-			
-		#end
-	end
-	
-	def solid_p(x, y)
-		#if(x < @width) && (y < @height)
-			z = @tiles[x / 32][y / 32]
-			if(z == 155 || z == 125 || z == 168 || z == 164 || z == 132 || z == 44 || z == 134 || z == 124 || z == 118 || z == 173 || z == 174 || z == 190 || z == 191 || z == 202 || z == 203 || z == 219 || z == 220 || z == 84 || z == 67 || z == 94 || z == 135 || z == 152 || z == 127 || z == 149 || z == 63 || z == 133 || z == 34 || z == 142)
-	
-				return true
-			else
-				return false
-			end
-	end
-	
-	def lava(x,y)
-		z = @tiles[x / 32][y / 32]
-		if(z == 88)
-			return true
-		else
-			return false
-		end
-	end
-
-end	
 
 class Inception < Gosu::Window
 attr_reader :map,:delay_cut
@@ -290,7 +76,7 @@ end
 
 def draw
 	if(@game_state == 'starting')
-		@background_image.draw(0, 0, 0)		
+		@background_image.draw(0, 0, 0)
 	elsif(@game_state == 'ended')
 		@background_image2.draw_rot(400, 300, 0,0)
 	elsif(@game_state == 'win')
@@ -309,7 +95,7 @@ def draw
 		@msg.draw
 	  elsif (Gosu::distance(@car.x, @car.y, @player.x, @player.y) < 90 && (@car.keys == true || @car.gasoline == true && @car.battery == false) && @mapa == "urbano")
 		@msg2.draw
-	  end	
+	  end
 	  @ammo.each_with_index do |item, index|
 		item.draw(@camera_x + (index*15),@camera_y,30)
 	  end
@@ -330,7 +116,7 @@ def draw
 		clip.draw
 	end
 	end
-	end	
+	end
 end
 
 def win
@@ -363,7 +149,7 @@ def mordido
 		@die.play
 		self.morre
 		end
-	end	
+	end
 end
 
 
@@ -399,7 +185,7 @@ end
 #def battery
 	#if((Gosu::distance(@car.x, @car.y, @player.x, @player.y) < 90) && (@car.keys == true && @car.gasoline == true && @car.battery == false))
 		#@gera_battery = true
-	#end	
+	#end
 #end
 
 def colisao_bala(x,y,angulo)
@@ -417,7 +203,7 @@ def colisao_bala(x,y,angulo)
 			@bullets.reject! do |bullet|
 			Gosu::distance(zombie.x, zombie.y, bullet.x, bullet.y) < 20
 			end
-			
+
 				if(Gosu::distance(zombie.x, zombie.y, x, y) < 20)
 					@hit.play
 					zombie.damage += @player.weapon_damage
@@ -437,7 +223,7 @@ def reload(clips)
 		@ammo << Gosu::Image.new(self, "media/shell.png", false)
 		end
 	end
-end	
+end
 def colisao_player(player_x,player_y,direcao)
 	future_x = @player.x
 	future_y = @player.y
@@ -447,26 +233,26 @@ def colisao_player(player_x,player_y,direcao)
 	elsif(direcao == false && @player.veiculo == "pe")
 		future_x -= Gosu::offset_x(@player.angulo, 25)
 		future_y -= Gosu::offset_y(@player.angulo, 25)
-	elsif(direcao == true && @player.veiculo == "car")	
+	elsif(direcao == true && @player.veiculo == "car")
 		future_x += Gosu::offset_x(@player.angulo, 70)
 		future_y += Gosu::offset_y(@player.angulo, 70)
-	elsif(direcao == false && @player.veiculo == "car")	
+	elsif(direcao == false && @player.veiculo == "car")
 		future_x -= Gosu::offset_x(@player.angulo, 70)
-		future_y -= Gosu::offset_y(@player.angulo, 70)		
+		future_y -= Gosu::offset_y(@player.angulo, 70)
 	end
 	if(@map.solid_p(future_x, future_y) == true)
 		return true
-	else 
+	else
 		return false
-	end 
+	end
 end
 
 def colisao_zombie(future_x,future_y)
 	if(@map.solid(future_x, future_y) == true)
 		return true
-	else 
+	else
 		return false
-	end 
+	end
 end
 
 def inception
@@ -510,7 +296,7 @@ def inception
 			@map = Map.new(self, "media/map.txt", "urbano")
 			@zombies = []
 			@clips = []
-			@shotgun = []			
+			@shotgun = []
 		end
 	end
 end
@@ -522,7 +308,7 @@ if ( button_down?(Gosu::Button::KbR) && (@game_state == 'ended' || @game_state =
 end
 if (@game_state == 'starting' ) then
 			if (button_down?(Gosu::Button::KbS)) then
-				@game_state = 'playing'	
+				@game_state = 'playing'
 			end
 end
 if ( button_down?(Gosu::Button::KbP) && @game_state != 'starting')
@@ -533,7 +319,7 @@ if ( button_down?(Gosu::Button::KbP) && @game_state != 'starting')
 			@game_state = 'playing'
 		end
 	@delay_pause = false
-	@last_pause = @last_time		
+	@last_pause = @last_time
 	end
 end
 
@@ -545,7 +331,7 @@ if(@game_state == 'playing')
 	if(@last_time > @last_bite + 0.4)
 		@delay_bite = true
 	end
-	if(@last_time > @last_layer + 60)
+	if(@last_time > @last_layer + 20)
 		@delay_layer = true
 	end
 	@camera_x = [[@player.x - 320, 0].max, @map.width * 50 - 640].min
@@ -564,7 +350,7 @@ if(@game_state == 'playing')
 				elsif(@mapa == 'futuro')
 				@zombies.push(Zombie.new(self,0,true,false,randx,randy,'futuro'))
 				end
-			end	
+			end
 		end
 	end
 	@zombies.each { |zombie| zombie.vida(zombie) }
@@ -578,7 +364,7 @@ if(@game_state == 'playing')
 		randy = ((rand * 2680)+20)
 		if(@map.solid(randx,randy) == false && Gosu::distance(randx, randy, @player.x, @player.y) > 400)
 			@clips.push(Clip.new(self,randx,randy))
-		end	
+		end
 	end
 	@clips.reject! do |clip|
 		if Gosu::distance(clip.x, clip.y, @player.x, @player.y) < 25 then
@@ -591,7 +377,7 @@ if(@game_state == 'playing')
 		randy = ((rand * 2680)+20)
 		if(@map.solid(randx,randy) == false && Gosu::distance(randx, randy, @player.x, @player.y) > 400)
 			@shotgun.push(Shotgun.new(self,randx,randy))
-		end	
+		end
 	end
 	@shotgun.reject! do |shotgun|
 		if Gosu::distance(shotgun.x, shotgun.y, @player.x, @player.y) < 20 then
@@ -599,14 +385,14 @@ if(@game_state == 'playing')
 			reload(7)
 		end
 	end
-	
+
 	if(@gera_key == true)
 		randx = 200#(rand * 3200)
 		randy = 200#((rand * 2680)+20)
 		#if(@map.solid(randx,randy) == false && Gosu::distance(randx, randy, @player.x, @player.y) > 700)
 			@key.push(Keys.new(self,randx,randy))
 			@gera_key = false
-		#end	
+		#end
 	end
 	@key.reject! do |key|
 		if Gosu::distance(key.x, key.y, @player.x, @player.y) < 30 then
@@ -620,7 +406,7 @@ if(@game_state == 'playing')
 		#if(@map.solid(randx,randy) == false && Gosu::distance(randx, randy, @player.x, @player.y) > 700)
 			@gas.push(Gas.new(self,randx,randy))#lembrar
 			@gera_gas = false
-		#end	
+		#end
 	end
 	@gas.reject! do |gas|
 		if Gosu::distance(gas.x, gas.y, @player.x, @player.y) < 30 then
@@ -634,7 +420,7 @@ if(@game_state == 'playing')
 		#if(@map.solid(randx,randy) == false && Gosu::distance(randx, randy, @player.x, @player.y) > 700)
 			@battery.push(Battery.new(self,randx,randy))
 			@gera_battery = false
-		#end	
+		#end
 	end
 	@battery.reject! do |battery|
 		if Gosu::distance(battery.x, battery.y, @player.x, @player.y) < 30 then
@@ -660,25 +446,25 @@ if(@game_state == 'playing')
 	if ( button_down?(Gosu::Button::KbRight) ) then
 		@player.girar_direita
 	end
-	
+
 	if ( button_down?(Gosu::Button::KbLeft) ) then
 		@player.girar_esquerda
 	end
-	
+
 	if ( button_down?(Gosu::Button::KbUp) && !(button_down?(Gosu::Button::KbSpace))) then
 		if(colisao_player(@player.x,@player.y,true) == false)
 			@player.mover_frente
 			@player.updateImg(@mapa)
 		end
 	end
-	
+
 	if ( button_down?(Gosu::Button::KbDown) && !(button_down?(Gosu::Button::KbSpace))) then
 		if(colisao_player(@player.x,@player.y,false) == false)
 		@player.mover_tras
 		@player.updateImg(@mapa)
 		end
 	end
-	
+
 	if ( button_down?(Gosu::Button::KbSpace))then
 		@player.mirar(@mapa)
 	end
@@ -686,15 +472,15 @@ if(@game_state == 'playing')
 	if ( button_down?(Gosu::Button::KbT))then
 		#@player.veiculo = "car"
 	end
-	
+
 	if ( button_down?(Gosu::Button::KbR))then
-		
-		
+
+
 		#@player.veiculo = "pe"
 	end
-	
 
-	
+
+
 	if ( button_down?(Gosu::Button::KbLeftAlt) && button_down?(Gosu::Button::KbSpace))then
 		if(@delay_shoot == true && @player.alive == true && @player.veiculo == "pe" && @player.weapon != "machete")
 			if(@player.ammo > 0)
@@ -711,9 +497,9 @@ if(@game_state == 'playing')
 			@delay_shoot = false
 			@last_disparo = @last_time
 		end
-	end	
-	
-	
+	end
+
+
 	if(@last_time > @last_disparo + @player.weapon_delay)
 		@delay_shoot = true
 	end
@@ -725,7 +511,8 @@ if(@game_state == 'playing')
 		@kills = 0
 	end
 	if(@delay_layer == true)
-		self.inception
+		#self.inception
+		@delay_layer = false
 	end
 	if(@mapa == 'inferno')
 		if(@map.lava(@player.x, @player.y) == true)
@@ -733,7 +520,7 @@ if(@game_state == 'playing')
 			self.morre
 		end
 	end
-	
+
 end
 
 end
