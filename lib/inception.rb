@@ -359,7 +359,7 @@ def mordido
 		@last_bite = @last_time
 		@player.alive = false
 		@player.hits += 1
-		if(@player.hits > 1)
+		if(@player.hits > 2)
 		@die.play
 		self.morre
 		end
@@ -695,7 +695,7 @@ if(@game_state == 'playing')
 	
 
 	
-	if ( button_down?(Gosu::Button::KbLeftControl) && button_down?(Gosu::Button::KbSpace))then
+	if ( button_down?(Gosu::Button::KbLeftAlt) && button_down?(Gosu::Button::KbSpace))then
 		if(@delay_shoot == true && @player.alive == true && @player.veiculo == "pe" && @player.weapon != "machete")
 			if(@player.ammo > 0)
 				@player.atirar
